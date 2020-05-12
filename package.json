@@ -1,20 +1,49 @@
 {
   "name": "rusttcpserverui",
   "version": "0.1.0",
+  "author": "Stuart Thompson (stuart@stuartthompson.net)",
+  "license": "GPL-3.0",
+  "description": "User Interface for Stu's Rust TCP Server",
   "private": true,
+  "main": "public/electron.js",
+  "homepage": "./",
+  "scripts": {
+    "build": "react-scripts build",
+    "start": "yarn install && react-scripts start && electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "preelectron-pack": "yarn build",
+    "electron-pack": "build --win --macos - c.extraMetadata.main=build/electron.js"
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-dom": "^16.13.1"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+  "devDependencies": {
+    "electron": "^8.2.5",
+    "electron-builder": "^22.6.0",
+    "typescript": "^3.9.2"
+  },
+  "build": {
+    "appId": "net.stuartthompson.rusttcpserverui",
+    "productName": "RustTCPServer",
+    "win": {
+      "target": ["portable"]
+    },
+    "portable": {
+      "artifactName": "rusttcpserverui.exe"
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   },
   "eslintConfig": {
     "extends": "react-app"
