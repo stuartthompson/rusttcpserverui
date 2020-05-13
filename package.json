@@ -9,7 +9,8 @@
   "homepage": "./",
   "scripts": {
     "build": "react-scripts build",
-    "start": "yarn install && react-scripts start && electron .",
+    "start": "env NODE_ENV=local && react-scripts start",
+    "electron-start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "yarn install && yarn build && electron-builder",
     "preelectron-pack": "yarn build",
