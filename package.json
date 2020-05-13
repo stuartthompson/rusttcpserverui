@@ -13,7 +13,6 @@
     "electron-start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "yarn install && yarn build && electron-builder",
-    "preelectron-pack": "yarn build",
     "electron-pack": "build --win --macos - c.extraMetadata.main=build/electron.js"
   },
   "dependencies": {
