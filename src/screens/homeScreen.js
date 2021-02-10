@@ -74,14 +74,14 @@ const HomeScreen = () => {
         adminWS.current.onerror = onAdminWebSocketError;
         adminWS.current.onmessage = onAdminWebSocketMessage;
         adminWS.current.onclose = onAdminWebSocketClose;
-    }, []);
+    }, [clientConnInfo.ip, clientConnInfo.port, adminConnInfo.ip, adminConnInfo.port]);
 
     const onSendHelloClicked = () => {
         clientWS.current.send("Hello!");
     }
 
     const onSendShutdownClicked = () => {
-        adminWS.current.send("Shutdown");
+        adminWS.current.send("ShutdownServer");
     }
 
     return (
