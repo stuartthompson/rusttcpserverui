@@ -1,66 +1,98 @@
 import React, { useState, useEffect, useRef } from 'react';
-import ServerStatus from '../components/serverStatus';
+import WSClientStatus from '../components/WSClientStatus';
 
 /**
  * Renders the application home screen.
  */
 const HomeScreen = () => {
     const IP = "127.0.0.1";
-    const PORT = "4000";
+    const CLIENT_PORT = "4000";
+    const ADMIN_PORT = "4001";
 
-    const [serverStatus, setServerStatus] = useState("None");
+    const [clientStatus, setClientStatus] = useState("None");
+    const [adminStatus, setAdminStatus] = useState("None");
 
-    const connectionInfo = {
+    const clientConnInfo = {
         ip: IP,
-        port: PORT
+        port: CLIENT_PORT
+    };
+    const adminConnInfo = {
+        ip: IP,
+        port: ADMIN_PORT
+    }
+
+    const clientWS = useRef();
+    const adminWS = useRef();
+
+    const onClientWebSocketOpen = e => {
+        console.log(`[Client] Websocket opened.`);
     };
 
-    const websocket = useRef();
-
-    const onWebSocketOpen = e => {
-        console.log(`Websocket opened.`);
+    const onClientWebSocketError = e => {
+        console.log("[Client] Error: " + JSON.stringify(e));
     };
 
-    const onWebSocketError = e => {
-        console.log("Error: " + JSON.stringify(e));
+    const onClientWebSocketMessage = e => {
+        console.log("[Client] Message received.");
+        console.log(`[Client] Received: ${e.data}`);
+        setClientStatus(JSON.parse(e.data));
     };
 
-    const onWebSocketMessage = e => {
-        console.log("Message received.");
-        console.log(`Received: ${e.data}`);
-        parseMessage(e.data);
+    const onClientWebSocketClose = () => {
+        console.log(`[Client] Websocket closed.`);
     };
 
-    /**
-     * Parses a message received from the server.
-     * @param {*} msg - The message to parse. 
-     */
-    const parseMessage = msg => {
-        const m = JSON.parse(msg);
-        setServerStatus(msg.serverStatus);
+    const onAdminWebSocketOpen = e => {
+        console.log(`[Admin] Websocket opened.`);
     };
 
-    const onWebSocketClose = () => {
-        console.log(`Websocket closed.`);
+    const onAdminWebSocketError = e => {
+        console.log("[Admin] Error: " + JSON.stringify(e));
+    };
+
+    const onAdminWebSocketMessage = e => {
+        console.log("[Admin] Message received.");
+        console.log(`[Admin] Received: ${e.data}`);
+        setAdminStatus(JSON.parse(e.data));
+    };
+
+    const onAdminWebSocketClose = () => {
+        console.log(`[Admin] Websocket closed.`);
     };
 
     useEffect(() => {
-        websocket.current = new WebSocket(`ws://${IP}:${PORT}`)
-        websocket.current.onopen = onWebSocketOpen;
-        websocket.current.onerror = onWebSocketError;
-        websocket.current.onmessage = onWebSocketMessage;
-        websocket.current.onclose = onWebSocketClose;
+        // Set up client websocket
+        clientWS.current = new WebSocket(`ws://${clientConnInfo.ip}:${clientConnInfo.port}`)
+        clientWS.current.onopen = onClientWebSocketOpen;
+        clientWS.current.onerror = onClientWebSocketError;
+        clientWS.current.onmessage = onClientWebSocketMessage;
+        clientWS.current.onclose = onClientWebSocketClose;
+
+        // Set up admin websocket
+        adminWS.current = new WebSocket(`ws://${adminConnInfo.ip}:${adminConnInfo.port}`)
+        adminWS.current.onopen = onAdminWebSocketOpen;
+        adminWS.current.onerror = onAdminWebSocketError;
+        adminWS.current.onmessage = onAdminWebSocketMessage;
+        adminWS.current.onclose = onAdminWebSocketClose;
     }, []);
 
     const onSendHelloClicked = () => {
-        websocket.current.send("Hello!");
+        clientWS.current.send("Hello!");
+    }
+
+    const onSendShutdownClicked = () => {
+        adminWS.current.send("Shutdown");
     }
 
     return (
         <>
-            <h1>WebRockets</h1>
-            <ServerStatus connectionInfo={connectionInfo} status={status} />
+            <h1>Regular Client</h1>
+            <WSClientStatus connectionInfo={clientConnInfo} status={clientStatus} />
             <input type="button" value="Send Hello" onClick={onSendHelloClicked} />
+
+            <h1>Admin Client</h1>
+            <WSClientStatus connectionInfo={adminConnInfo} status={adminStatus} />
+            <input type="button" value="Send Shutdown" onClick={onSendShutdownClicked} />
         </>
     );
 };
