@@ -35,7 +35,7 @@ const HomeScreen = () => {
     const onClientWebSocketMessage = e => {
         console.log("[Client] Message received.");
         console.log(`[Client] Received: ${e.data}`);
-        setClientStatus(JSON.parse(e.data));
+        setClientStatus(e.data);
     };
 
     const onClientWebSocketClose = () => {
